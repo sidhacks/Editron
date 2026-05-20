@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -56,9 +55,13 @@ const TemplateSelectionModal = ({
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [projectName, setProjectName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | "all">("all");
+  const [selectedCategory, setSelectedCategory] = useState<
+    TemplateCategory | "all"
+  >("all");
 
-  const [availableTemplates, setAvailableTemplates] = useState<TemplateSummary[]>([]);
+  const [availableTemplates, setAvailableTemplates] = useState<
+    TemplateSummary[]
+  >([]);
 
   useEffect(() => {
     fetch("/api/templates/meta")
@@ -71,13 +74,14 @@ const TemplateSelectionModal = ({
       .catch(() => {});
   }, []);
 
-  const categoryTabs: Array<{ key: TemplateCategory | "all"; label: string }> = [
-    { key: "all", label: "All" },
-    { key: "frontend", label: "Frontend" },
-    { key: "backend", label: "Backend" },
-    { key: "fullstack", label: "Fullstack" },
-    { key: "tooling", label: "Tooling" },
-  ];
+  const categoryTabs: Array<{ key: TemplateCategory | "all"; label: string }> =
+    [
+      { key: "all", label: "All" },
+      { key: "frontend", label: "Frontend" },
+      { key: "backend", label: "Backend" },
+      { key: "fullstack", label: "Fullstack" },
+      { key: "tooling", label: "Tooling" },
+    ];
 
   const filteredTemplates = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -89,14 +93,17 @@ const TemplateSelectionModal = ({
         normalizedQuery.length === 0 ||
         template.name.toLowerCase().includes(normalizedQuery) ||
         template.description.toLowerCase().includes(normalizedQuery) ||
-        template.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery));
+        template.tags?.some((tag) =>
+          tag.toLowerCase().includes(normalizedQuery),
+        );
 
       return matchesCategory && matchesSearch;
     });
   }, [availableTemplates, searchQuery, selectedCategory]);
 
   const selectedTemplateSummary =
-    availableTemplates.find((template) => template.id === selectedTemplate) ?? null;
+    availableTemplates.find((template) => template.id === selectedTemplate) ??
+    null;
 
   const resetSelectionState = () => {
     setStep("select");
@@ -105,7 +112,6 @@ const TemplateSelectionModal = ({
     setSearchQuery("");
     setSelectedCategory("all");
   };
-
 
   const handleSelectTemplate = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -120,7 +126,9 @@ const TemplateSelectionModal = ({
   const handleCreateProject = () => {
     if (selectedTemplate) {
       onSubmit({
-        title: projectName || `New ${selectedTemplateSummary?.name || "Template"} Project`,
+        title:
+          projectName ||
+          `New ${selectedTemplateSummary?.name || "Template"} Project`,
         template: selectedTemplate as TemplateKey,
         description: selectedTemplateSummary?.description,
       });
@@ -168,7 +176,7 @@ const TemplateSelectionModal = ({
                   />
                   <Input
                     placeholder="Search templates..."
-                    value={searchQuery}  
+                    value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
                   />
@@ -180,7 +188,9 @@ const TemplateSelectionModal = ({
                   <Button
                     key={tab.key}
                     type="button"
-                    variant={selectedCategory === tab.key ? "default" : "outline"}
+                    variant={
+                      selectedCategory === tab.key ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setSelectedCategory(tab.key)}
                     className={
@@ -204,10 +214,11 @@ const TemplateSelectionModal = ({
                       <div
                         key={template.id}
                         className={`relative flex p-6 border rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02]
-                        ${selectedTemplate === template.id
+                        ${
+                          selectedTemplate === template.id
                             ? "border-[#E93F3F] shadow-[0_0_0_1px_#E93F3F,0_8px_20px_rgba(233,63,63,0.15)]"
                             : "hover:border-[#E93F3F] shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.1)]"
-                          }
+                        }
                     `}
                         onClick={() => handleSelectTemplate(template.id)}
                       >
@@ -217,63 +228,97 @@ const TemplateSelectionModal = ({
                           </div>
                         )}
 
-                          <div className="flex gap-4">
-                            <div
-                              className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-full"
-                              style={getIconTileStyle(template.color)}
-                            >
-                              <IconWithFallback src={template.icon} alt={`${template.name} icon`} size={40} />
+                        <div className="flex gap-4">
+                          <div
+                            className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-full"
+                            style={getIconTileStyle(template.color)}
+                          >
+                            <IconWithFallback
+                              src={template.icon}
+                              alt={`${template.name} icon`}
+                              size={40}
+                            />
+                          </div>
+
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-lg font-semibold">
+                                {template.name}
+                              </h3>
+                              <div className="flex gap-1">
+                                {template.category === "frontend" && (
+                                  <Code size={14} className="text-blue-500" />
+                                )}
+                                {template.category === "backend" && (
+                                  <Server
+                                    size={14}
+                                    className="text-green-500"
+                                  />
+                                )}
+                                {template.category === "fullstack" && (
+                                  <Globe
+                                    size={14}
+                                    className="text-purple-500"
+                                  />
+                                )}
+                                {template.category === "tooling" && (
+                                  <Terminal
+                                    size={14}
+                                    className="text-orange-500"
+                                  />
+                                )}
+                              </div>
                             </div>
 
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="text-lg font-semibold">
-                                  {template.name}
-                                </h3>
-                                <div className="flex gap-1">
-                                  {(template.category === "frontend") && <Code size={14} className="text-blue-500" />}
-                                  {(template.category === "backend") && <Server size={14} className="text-green-500" />}
-                                  {(template.category === "fullstack") && <Globe size={14} className="text-purple-500" />}
-                                  {(template.category === "tooling") && <Terminal size={14} className="text-orange-500" />}
-                                </div>
-                              </div>
+                            <div
+                              className="flex items-center gap-1 mb-2"
+                              aria-label={`Popularity ${template.popularity ?? 0} out of ${MAX_STARS}`}
+                            >
+                              {Array.from({ length: MAX_STARS }, (_, index) => {
+                                const active =
+                                  (template.popularity ?? 0) > index;
 
-                              <div className="flex items-center gap-1 mb-2" aria-label={`Popularity ${template.popularity ?? 0} out of ${MAX_STARS}`}>
-                                {Array.from({ length: MAX_STARS }, (_, index) => {
-                                  const active = (template.popularity ?? 0) > index;
+                                return (
+                                  <Star
+                                    key={`${template.id}-star-${index}`}
+                                    size={13}
+                                    className={
+                                      active
+                                        ? "text-amber-500 fill-amber-500"
+                                        : "text-muted-foreground/30"
+                                    }
+                                  />
+                                );
+                              })}
+                            </div>
 
-                                  return (
-                                    <Star
-                                      key={`${template.id}-star-${index}`}
-                                      size={13}
-                                      className={active ? "text-amber-500 fill-amber-500" : "text-muted-foreground/30"}
-                                    />
-                                  );
-                                })}
-                              </div>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {template.description}
+                            </p>
 
-                              <p className="text-sm text-muted-foreground mb-3">
-                                {template.description}
-                              </p>
+                            <div className="flex flex-wrap gap-2">
+                              {template.tags?.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-xs px-2 py-1 bg-muted/20 rounded-full text-muted-foreground"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
 
-                              <div className="flex flex-wrap gap-2">
-                                {template.tags?.slice(0,3).map((tag) => (
-                                  <span key={tag} className="text-xs px-2 py-1 bg-muted/20 rounded-full text-muted-foreground">{tag}</span>
-                                ))}
-                              </div>
-
-                              <div className="mt-3 flex flex-wrap gap-2">
-                                {template.features.slice(0, 3).map((feature) => (
-                                  <span
-                                    key={`${template.id}-${feature}`}
-                                    className="text-xs px-2 py-1 rounded-full border border-border/70 bg-background/80 text-foreground/80"
-                                  >
-                                    {feature}
-                                  </span>
-                                ))}
-                              </div>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {template.features.slice(0, 3).map((feature) => (
+                                <span
+                                  key={`${template.id}-${feature}`}
+                                  className="text-xs px-2 py-1 rounded-full border border-border/70 bg-background/80 text-foreground/80"
+                                >
+                                  {feature}
+                                </span>
+                              ))}
                             </div>
                           </div>
+                        </div>
 
                         <RadioGroupItem
                           value={template.id}
@@ -297,7 +342,7 @@ const TemplateSelectionModal = ({
               </RadioGroup>
             </div>
 
-            <div className="flex justify-between gap-3 mt-4 pt-4 border-t">
+            <div className="sticky bottom-2 mx-auto w-fit min-w-[420px] rounded-2xl border border-white/10 bg-[#151517]/70 backdrop-blur-2xl px-5 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.45)] flex justify-between items-center gap-4">
               <div className="flex items-center text-sm text-muted-foreground">
                 <Clock size={14} className="mr-1" />
                 <span>
@@ -326,7 +371,8 @@ const TemplateSelectionModal = ({
                 Configure Your Project
               </DialogTitle>
               <DialogDescription>
-                {selectedTemplateSummary?.name || "Selected template"} project configuration
+                {selectedTemplateSummary?.name || "Selected template"} project
+                configuration
               </DialogDescription>
             </DialogHeader>
 
@@ -344,19 +390,28 @@ const TemplateSelectionModal = ({
               <div className="p-4 shadow-[0_0_0_1px_#E93F3F,0_8px_20px_rgba(233,63,63,0.15)] rounded-lg border">
                 <h3 className="font-medium mb-2">Selected Template</h3>
                 <p className="text-sm text-muted-foreground">
-                  {selectedTemplateSummary?.description || "Template details will appear here after selection."}
+                  {selectedTemplateSummary?.description ||
+                    "Template details will appear here after selection."}
                 </p>
                 {selectedTemplateSummary && (
                   <>
-                    <div className="mt-3 flex items-center gap-1" aria-label={`Popularity ${selectedTemplateSummary.popularity ?? 0} out of ${MAX_STARS}`}>
+                    <div
+                      className="mt-3 flex items-center gap-1"
+                      aria-label={`Popularity ${selectedTemplateSummary.popularity ?? 0} out of ${MAX_STARS}`}
+                    >
                       {Array.from({ length: MAX_STARS }, (_, index) => {
-                        const active = (selectedTemplateSummary.popularity ?? 0) > index;
+                        const active =
+                          (selectedTemplateSummary.popularity ?? 0) > index;
 
                         return (
                           <Star
                             key={`${selectedTemplateSummary.id}-summary-star-${index}`}
                             size={13}
-                            className={active ? "text-amber-500 fill-amber-500" : "text-muted-foreground/30"}
+                            className={
+                              active
+                                ? "text-amber-500 fill-amber-500"
+                                : "text-muted-foreground/30"
+                            }
                           />
                         );
                       })}
@@ -397,7 +452,15 @@ const TemplateSelectionModal = ({
 
 export default TemplateSelectionModal;
 
-function IconWithFallback({ src, alt, size = 28 }: { src?: string; alt?: string; size?: number }) {
+function IconWithFallback({
+  src,
+  alt,
+  size = 28,
+}: {
+  src?: string;
+  alt?: string;
+  size?: number;
+}) {
   const [current, setCurrent] = useState(src || ICON_PLACEHOLDER);
 
   const tryFallback = () => {
